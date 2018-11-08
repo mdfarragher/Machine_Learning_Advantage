@@ -4,6 +4,7 @@ using Accord.Math.Optimization.Losses;
 using Accord.Statistics;
 using Accord.Statistics.Models.Regression.Linear;
 using Accord.Statistics.Visualizations;
+using ConsoleTables;
 using Deedle;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,32 @@ namespace ml_csharp_lesson3
         }
 
         /// <summary>
+        /// Print the correlation matrix on the console.
+        /// </summary>
+        /// <param name="data">The data frame the matrix is based on</param>
+        /// <param name="matrix">The correlation matrix to print</param>
+        private static void Print(Frame<int, string> data, double[,] matrix)
+        {
+            // set up table header
+            var table = new ConsoleTable(" "); 
+            var columns = data.ColumnKeys.ToArray();
+            table.AddColumn(columns);
+
+            // add matrix data
+            var step = matrix.GetLength(1);
+            var colIndex = 0;
+            for (var i=0; i < matrix.Length; i+=step)
+            {
+                var values = matrix.Cast<double>().Skip(i).Take(step).Select(v => v.ToString("0.0")).ToList();
+                values.Insert(0, columns[colIndex++]);
+                table.AddRow(values.ToArray());
+            }
+
+            // show the correlation matrix
+            table.Write();
+        }
+
+        /// <summary>
         /// The main application entry point.
         /// </summary>
         /// <param name="args">Command line arguments.</param>
@@ -81,8 +108,7 @@ namespace ml_csharp_lesson3
             var correlation = Measures.Correlation(housing.ToArray2D<double>());
 
             // show the correlation matrix
-            Console.WriteLine(housing.ColumnKeys.ToArray().ToString<string>());
-            Console.WriteLine(correlation.ToString<double>("0.0"));
+            Print(housing, correlation);
 
             // calculate binned latitudes
             var binned_latitude =

@@ -59,6 +59,9 @@
     <Reference Include="Accord.Statistics, Version=3.8.0.0, Culture=neutral, PublicKeyToken=fa1a88e29555ccf7, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Accord.Statistics.3.8.0\lib\net462\Accord.Statistics.dll</HintPath>
     </Reference>
+    <Reference Include="ConsoleTables, Version=2.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\ConsoleTables.2.2.0\lib\net40\ConsoleTables.dll</HintPath>
+    </Reference>
     <Reference Include="Deedle, Version=1.2.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Deedle.1.2.5\lib\net40\Deedle.dll</HintPath>
     </Reference>
