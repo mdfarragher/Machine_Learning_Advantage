@@ -125,6 +125,32 @@ namespace Pensar
             return result;
         }
 
+        /// <summary>
+        /// The mean squared error loss function for linear models.
+        /// </summary>
+        /// <param name="prediction">The prediction variable</param>
+        /// <param name="labels">The label variable</param>
+        /// <returns></returns>
+        public static CNTK.Function MeanSquaredError(CNTK.Variable prediction, CNTK.Variable labels)
+        {
+            var squared_errors = CNTK.CNTKLib.Square(CNTK.CNTKLib.Minus(prediction, labels));
+            var result = CNTK.CNTKLib.ReduceMean(squared_errors, new CNTK.Axis(0)); // TODO -- allStaticAxes?
+            return result;
+        }
+
+        /// <summary>
+        /// The mean absolute error loss function for linear models.
+        /// </summary>
+        /// <param name="prediction">The prediction variable</param>
+        /// <param name="labels">The label variable</param>
+        /// <returns></returns>
+        public static CNTK.Function MeanAbsoluteError(CNTK.Variable prediction, CNTK.Variable labels)
+        {
+            var absolute_errors = CNTK.CNTKLib.Abs(CNTK.CNTKLib.Minus(prediction, labels));
+            var result = CNTK.CNTKLib.ReduceMean(absolute_errors, new CNTK.Axis(0)); // TODO -- allStaticAxes? 
+            return result;
+        }
+
 
         /// <summary>
         /// Get an RMSProp learner to train the network.

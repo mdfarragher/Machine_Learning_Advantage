@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Pensar
@@ -94,6 +95,28 @@ namespace Pensar
                 action(data, begin, end);
                 begin = end;
 
+            }
+        }
+
+        /// <summary>
+        /// Partition the indices into a set of KFold partitions and call an action on each partition.
+        /// </summary>
+        /// <param name="indices">The indices to use.</param>
+        /// <param name="numFolds">The number of KFold partitions to create.</param>
+        /// <param name="action">The action to perform on each partition.</param>
+        public static void KFold(
+            this int[] indices,
+            int numFolds,
+            Action<int, int[], int[]> action)
+        {
+            var foldSize = indices.Length / numFolds;
+            for (int i = 0; i < numFolds; i++)
+            {
+                var validationIndices = Enumerable.Range(i * foldSize, foldSize).ToArray();
+                var trainingIndices1 = Enumerable.Range(0, i * foldSize);
+                var trainingIndices2 = Enumerable.Range((i + 1) * foldSize, indices.Length - (i + 1) * foldSize);
+                var trainingIndices = trainingIndices1.Concat(trainingIndices2).ToArray();
+                action(i, trainingIndices, validationIndices);
             }
         }
 
