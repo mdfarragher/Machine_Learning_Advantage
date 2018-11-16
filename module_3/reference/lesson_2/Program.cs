@@ -59,7 +59,7 @@ namespace ml_csharp_lesson2
             var evaluator = network.GetEvaluator(errorFunc);
 
             // declare some variables
-            var maxEpochs = 20;
+            var maxEpochs = 20; 
             var batchSize = 128;
             var loss = 0.0;
             var error = 0.0;
@@ -97,14 +97,12 @@ namespace ml_csharp_lesson2
                 // show results
                 loss /= batchCount;
                 error /= batchCount;
-                Console.WriteLine($"loss: {loss}, error: {error}");
-            }
+                Console.Write($"training loss: {loss}, ");
 
-            // test the network using batches
-            Console.WriteLine("Testing the neural network....");
-            error = 0.0;
-            batchCount = 0;
-            test_data.Batch(batchSize, (data, begin, end) =>
+                // test the network using batches
+                error = 0.0;
+                batchCount = 0;
+                test_data.Batch(batchSize, (data, begin, end) =>
                 {
                     // get the current batch for testing 
                     var featureBatch = features.GetBatch(test_data, begin, end);
@@ -118,11 +116,14 @@ namespace ml_csharp_lesson2
                         }
                     );
                     batchCount++;
-                }
-            );
+                });
+
+                // show results
+                error /= batchCount;
+                Console.WriteLine($"validation error: {error}");
+            }
 
             // show results
-            error /= batchCount;
             Console.WriteLine($"Final classification error on test data: {100 * error:0.00}%");
             Console.WriteLine($"Final accuracy on test data: {1 - error:0.00}");
 
