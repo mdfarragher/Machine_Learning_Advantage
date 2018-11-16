@@ -56,13 +56,15 @@ namespace Pensar
         /// <param name="input">The neural network to expand.</param>
         /// <param name="outputDim">The number of dimensions in the dense layer.</param>
         /// <param name="activation">The activation function in the dense layer.</param>
+        /// <param name="outputName">The name of the layer.</param>
         /// <returns>The neural network with the dense layer added.</returns>
         public static CNTK.Variable Dense(
             this CNTK.Variable input,
             int outputDim,
-            Func<CNTK.Variable, CNTK.Function> activation)
+            Func<CNTK.Variable, CNTK.Function> activation,
+            string outputName = "")
         {
-            return (CNTK.Variable)activation(Dense(input, outputDim));
+            return (CNTK.Variable)activation(Dense(input, outputDim, outputName));
         }
 
         /// <summary>
@@ -70,6 +72,7 @@ namespace Pensar
         /// </summary>
         /// <param name="input">The neural network to expand.</param>
         /// <param name="outputDim">The number of dimensions in the dense layer.</param>
+        /// <param name="outputName">The name of the layer.</param>
         /// <returns>The neural network with the dense layer added.</returns>
         public static CNTK.Variable Dense(
             this CNTK.Variable input,
@@ -101,6 +104,58 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Add a 2D convolution layer to a neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand.</param>
+        /// <param name="outputChannels">The number of output channels</param>
+        /// <param name="filterShape">The shape of the filter</param>
+        /// <param name="padding">Use padding or not?</param>
+        /// <param name="bias">Use bias or not?</param>
+        /// <param name="strides">The stride lengths</param>
+        /// <param name="activation">The activation function to use</param>
+        /// <param name="outputName">The name of the layer.</param>
+        /// <returns>The neural network with the convolution layer added.</returns>
+        public static CNTK.Variable Convolution2D(
+            this CNTK.Variable input,
+            int outputChannels,
+            int[] filterShape,
+            bool padding = false,
+            bool bias = true,
+            int[] strides = null,
+            Func<CNTK.Variable, string, CNTK.Function> activation = null,
+            string outputName = "")
+        {
+            var convolution_map_size = new int[] {
+                filterShape[0],
+                filterShape[1],
+                CNTK.NDShape.InferredDimension,
+                outputChannels
+            };
+            if (strides == null)
+            {
+                strides = new int[] { 1 };
+            }
+            return Convolution(convolution_map_size, input, padding, bias, strides, activation, outputName);
+        }
+
+        /// <summary>
+        /// Add a pooling layer to a neural network. 
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="poolingType">The type of pooling to perform</param>
+        /// <param name="windowShape">The shape of the pooling window</param>
+        /// <param name="strides">The stride lengths</param>
+        /// <returns>The neural network with the pooling layer added.</returns>
+        public static CNTK.Variable Pooling(
+            this CNTK.Variable input,
+            CNTK.PoolingType poolingType,
+            int[] windowShape,
+            int[] strides)
+        {
+            return CNTK.CNTKLib.Pooling(input, poolingType, windowShape, strides);
+        }
+
+        /// <summary>
         /// Cast a network layer to a Function.
         /// </summary>
         /// <param name="input">The neural network to expand.</param>
@@ -109,6 +164,37 @@ namespace Pensar
             this CNTK.Variable input)
         {
             return (CNTK.Function)input;
+        }
+
+        /// <summary>
+        /// Return a summary description of the neural network.
+        /// </summary>
+        /// <param name="model">The neural network to describe</param>
+        /// <returns>A string description of the neural network</returns>
+        public static string ToSummary(this CNTK.Function model)
+        {
+            var sb = new StringBuilder();
+            sb.AppendFormat("\tInput = " + model.Arguments[0].Shape.AsString());
+            sb.Append(Environment.NewLine);
+            for (int i = 0; i < model.Outputs.Count; i++)
+            {
+                sb.AppendFormat("\tOutput = " + model.Outputs[i].Shape.AsString());
+                sb.Append(Environment.NewLine);
+            }
+            sb.Append(Environment.NewLine);
+
+            var numParameters = 0;
+            foreach (var x in model.Parameters())
+            {
+                var shape = x.Shape;
+                var p = shape.TotalSize;
+                sb.AppendFormat(string.Format("\tFilter Shape:{0,-30} Params:{1}", shape.AsString(), p));
+                sb.Append(Environment.NewLine);
+                numParameters += p;
+            }
+            sb.AppendFormat(string.Format("\tTotal Number of Parameters: {0:N0}", numParameters));
+            sb.Append(Environment.NewLine);
+            return sb.ToString();
         }
 
         /// <summary>
@@ -188,17 +274,14 @@ namespace Pensar
         /// </summary>
         /// <param name="input">The network to train.</param>
         /// <param name="learningRateSchedule">The learning rate schedule.</param>
-        /// <param name="gamma">The gamma value.</param>
-        /// <param name="inc">The inc value.</param>
-        /// <param name="dec">The dec value.</param>
-        /// <param name="max">The max value.</param>
-        /// <param name="min">The min value.</param>
-        /// <returns>An RMSProp learner to train the network.</returns>
+        /// <param name="momentumSchedule">The moment schedule.</param>
+        /// <param name="unitGain">The unit gain.</param>
+        /// <returns>An Adamlearner to train the network.</returns>
         public static CNTK.Learner GetAdamLearner(
             this CNTK.Function input,
             (double, uint) learningRateSchedule,
             (double, uint) momentumSchedule,
-            bool unitGain)
+            bool unitGain = true)
         {
             var parameterVector = new CNTK.ParameterVector((System.Collections.ICollection)input.Parameters());
             return CNTK.CNTKLib.AdamLearner(
@@ -284,6 +367,90 @@ namespace Pensar
                 dict,
                 CurrentDevice);
         }
+
+        // *******************************************************************
+        // Private utility functions
+        // *******************************************************************
+
+        /// <summary>
+        /// Helper method to add a convolution layer to a neural network.
+        /// </summary>
+        /// <param name="convolutionMapSize"></param>
+        /// <param name="input">The neural network to expand.</param>
+        /// <param name="padding">Use padding or not?</param>
+        /// <param name="bias">Use bias or not?</param>
+        /// <param name="strides">The stride lengths</param>
+        /// <param name="activation">The activation function to use</param>
+        /// <param name="outputName">The name of the layer.</param>
+        /// <returns></returns>
+        private static CNTK.Function Convolution(
+          int[] convolutionMapSize,
+          CNTK.Variable input,
+          bool padding,
+          bool bias,
+          int[] strides,
+          Func<CNTK.Variable, string, CNTK.Function> activation = null,
+          string outputName = "")
+        {
+            var W = new CNTK.Parameter(
+              CNTK.NDShape.CreateNDShape(convolutionMapSize),
+              CNTK.DataType.Float,
+              CNTK.CNTKLib.GlorotUniformInitializer(
+                  CNTK.CNTKLib.DefaultParamInitScale, 
+                  CNTK.CNTKLib.SentinelValueForInferParamInitRank, 
+                  CNTK.CNTKLib.SentinelValueForInferParamInitRank, 1),
+              NetUtil.CurrentDevice, outputName + "_W");
+
+            var result = CNTK.CNTKLib.Convolution(
+                W, 
+                input, 
+                strides, 
+                new CNTK.BoolVector(new bool[] { true }) /* sharing */, 
+                new CNTK.BoolVector(new bool[] { padding }));
+
+            if (bias)
+            {
+                var num_output_channels = convolutionMapSize[convolutionMapSize.Length - 1];
+                var b_shape = ConcatenateArrays(MakeOnesArray(convolutionMapSize.Length - 2), new int[] { num_output_channels });
+                var b = new CNTK.Parameter(b_shape, 0.0f, NetUtil.CurrentDevice, outputName + "_b");
+                result = CNTK.CNTKLib.Plus(result, b);
+            }
+
+            if (activation != null)
+            {
+                result = activation(result, outputName);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Concatenate arrays.
+        /// </summary>
+        /// <typeparam name="T">The type of array element</typeparam>
+        /// <param name="arguments">The arrays to concatenate</param>
+        /// <returns>The concatenated array</returns>
+        private static T[] ConcatenateArrays<T>(params T[][] arguments) where T : struct
+        {
+            var list = new List<T>();
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                list.AddRange(arguments[i]);
+            }
+            return list.ToArray();
+        }
+
+        /// <summary>
+        /// Create an array filled with ones.
+        /// </summary>
+        /// <param name="numOnes">The number of ones to create</param>
+        /// <returns>A new array filled with the specified number of ones</returns>
+        private static int[] MakeOnesArray(int numOnes)
+        {
+            var ones = new int[numOnes];
+            for (int i = 0; i < numOnes; i++) { ones[i] = 1; }
+            return ones;
+        }
+
 
     }
 }
