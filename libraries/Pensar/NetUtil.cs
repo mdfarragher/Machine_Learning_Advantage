@@ -156,6 +156,34 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Add a dropout layer to the neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="dropoutRate">The dropout rate to use</param>
+        /// <returns>The neural network with the dropout layer added</returns>
+        public static CNTK.Variable Dropout(
+            this CNTK.Variable input,
+            double dropoutRate)
+        {
+            return CNTK.CNTKLib.Dropout(input, 0.5);
+        }
+
+        /// <summary>
+        /// Multiply all tensor elements in the network by the given scalar.
+        /// </summary>
+        /// <typeparam name="T">The type of the scalar to multiply by</typeparam>
+        /// <param name="input">The neural network</param>
+        /// <param name="scalar">The scalar to multiply by</param>
+        /// <returns>The neural network with the multiplication layer added</returns>
+        public static CNTK.Variable MultiplyBy<T>(
+            this CNTK.Variable input,
+            T scalar)
+        {
+            var scalarTensor = CNTK.Constant.Scalar<T>(scalar, NetUtil.CurrentDevice);
+            return CNTK.CNTKLib.ElementTimes(scalarTensor, input);
+        }
+
+        /// <summary>
         /// Cast a network layer to a Function.
         /// </summary>
         /// <param name="input">The neural network to expand.</param>
@@ -350,6 +378,30 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Train the network trainer on a batch.
+        /// </summary>
+        /// <param name="trainer">The trainer to use.</param>
+        /// <param name="batch">The batch of features and labels to use.</param>
+        /// <returns>A tuple of the current loss and evaluation values.</returns>
+        public static (double Loss, double Evaluation) TrainBatch(
+            this CNTK.Trainer trainer,
+            (CNTK.Variable, CNTK.MinibatchData)[] batch)
+        {
+            var dict = new Dictionary<CNTK.Variable, CNTK.MinibatchData>();
+            foreach (var t in batch)
+                dict.Add(t.Item1, t.Item2);
+
+            trainer.TrainMinibatch(
+                dict,
+                CurrentDevice);
+
+            return (
+                Loss: trainer.PreviousMinibatchLossAverage(),
+                Evaluation: trainer.PreviousMinibatchEvaluationAverage());
+        }
+
+
+        /// <summary>
         /// Test the network evaluator on a batch.
         /// </summary>
         /// <param name="trainer">The evaluator to use.</param>
@@ -360,6 +412,25 @@ namespace Pensar
             (CNTK.Variable, CNTK.Value)[] batch)
         {
             var dict = new CNTK.UnorderedMapVariableValuePtr();
+            foreach (var t in batch)
+                dict.Add(t.Item1, t.Item2);
+
+            return evaluator.TestMinibatch(
+                dict,
+                CurrentDevice);
+        }
+
+        /// <summary>
+        /// Test the network evaluator on a batch.
+        /// </summary>
+        /// <param name="trainer">The evaluator to use.</param>
+        /// <param name="batch">The batch of features and labels to use.</param>
+        /// <returns>The current accuracy of the network.</returns>
+        public static double TestBatch(
+            this CNTK.Evaluator evaluator,
+            (CNTK.Variable, CNTK.MinibatchData)[] batch)
+        {
+            var dict = new CNTK.UnorderedMapVariableMinibatchData();
             foreach (var t in batch)
                 dict.Add(t.Item1, t.Item2);
 

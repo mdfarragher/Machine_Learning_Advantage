@@ -221,5 +221,18 @@ namespace Pensar
             Array.Copy(source, begin, result, 0, result.Length);
             return CNTK.Value.CreateBatch(variable.Shape, result, NetUtil.CurrentDevice, true);
         }
+
+        /// <summary>
+        /// Get a batch from the given image reader.
+        /// </summary>
+        /// <param name="reader">The image reader to use.</param>
+        /// <param name="batchSize">The size of the batch.</param>
+        /// <returns>A batch of values taken from the given image reader.</returns>
+        public static CNTK.UnorderedMapStreamInformationMinibatchData GetBatch(
+            this CNTK.MinibatchSource reader,
+            int batchSize)
+        {
+            return reader.GetNextMinibatch((uint)batchSize, NetUtil.CurrentDevice);
+        }
     }
 }
