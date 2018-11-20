@@ -184,6 +184,19 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Add the VGG16 convolutional base to the network.
+        /// </summary>
+        /// <param name="input">The neural network</param>
+        /// <param name="allowBlock5Finetuning">Indicates if block5 finetuning is allowed</param>
+        /// <returns>The neural network with the VGG16 convolutional base added</returns>
+        public static CNTK.Variable VGG16(
+            this CNTK.Variable input, 
+            bool allowBlock5Finetuning)
+        {
+            return DataUtil.VGG16.GetModel(input, allowBlock5Finetuning);
+        }
+
+        /// <summary>
         /// Cast a network layer to a Function.
         /// </summary>
         /// <param name="input">The neural network to expand.</param>
