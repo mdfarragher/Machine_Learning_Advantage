@@ -69,7 +69,7 @@ namespace ml_csharp_lesson4
             // ADD YOUR NETWORK CREATION CODE HERE
             // ***********************************
 
-            return null; // remove this when done!
+            return null; // return the finished network here!
         }
 
         /// <summary>
