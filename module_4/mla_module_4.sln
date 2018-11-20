@@ -5,8 +5,7 @@ VisualStudioVersion = 15.0.27428.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B942A04C-95FC-4D2B-8682-314CFC010CC4}"
 	ProjectSection(SolutionItems) = preProject
-		california_housing.csv = california_housing.csv
-		imdb_data.zip = imdb_data.zip
+		catsanddogs.zip = catsanddogs.zip
 		mnist_data.zip = mnist_data.zip
 	EndProjectSection
 EndProject
