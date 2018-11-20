@@ -70,7 +70,7 @@ namespace ml_csharp_lesson2
         const int imageWidth = 150;
         const int imageHeight = 150;
         const int numChannels = 3;
-        const int maxEpochs = 1; // was 100;
+        const int maxEpochs = 100;
         const int batchSize = 32;
 
         /// <summary>
@@ -121,8 +121,9 @@ namespace ml_csharp_lesson2
             }
 
             // get a training and validation image reader
-            var trainingReader = DataUtil.GetImageReader("train_map.txt", imageWidth, imageHeight, numChannels, 2, false);
-            var validationReader = DataUtil.GetImageReader("validation_map.txt", imageWidth, imageHeight, numChannels, 2, false);
+            Console.WriteLine("Augmentation is: OFF");
+            var trainingReader = DataUtil.GetImageReader("train_map.txt", imageWidth, imageHeight, numChannels, 2, randomizeData: true, augmentData: false);
+            var validationReader = DataUtil.GetImageReader("validation_map.txt", imageWidth, imageHeight, numChannels, 2, randomizeData: false, augmentData: false);
 
             // build features and labels
             var features = NetUtil.Var(new int[] { imageHeight, imageWidth, numChannels }, DataType.Float);
