@@ -135,6 +135,8 @@ namespace ml_csharp_lesson3
             // ADD YOUR CODE HERE
             // ******************
 
+            CNTK.Function network = null; // fix this line!
+
             // print the network to the console
             Console.WriteLine("Neural Network architecture: ");
             Console.WriteLine(network.ToSummary());
