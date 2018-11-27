@@ -5,16 +5,21 @@ using System.Linq;
 using System.Windows.Forms;
 using Accord.Imaging.Filters;
 using Accord.Imaging;
+using System.Threading;
 
 namespace ml_csharp_lesson1
 {
     public partial class MainForm : Form
     {
+        private int _matchesCount;
+        private readonly SynchronizationContext _synchronizationContext;
+
         /// <summary>
         /// Initialize MainForm.
         /// </summary>
         public MainForm()
         {
+            _synchronizationContext = WindowsFormsSynchronizationContext.Current;
             InitializeComponent();
         }
 
@@ -35,7 +40,8 @@ namespace ml_csharp_lesson1
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            SetVideo("./input.mp4");
+            SetVideo(@"D:\MachineLearningCourseMark\Machine_Learning_Advantage-master\Machine_Learning_Advantage\module_5\starter\input.mp4");
+           // SetVideo("./input.mp4");
             videoPlayer.Start();
         }
 
@@ -103,7 +109,17 @@ namespace ml_csharp_lesson1
             // ADD YOUR CODE HERE
             // ******************
 
-            return new Rectangle[] { };  // replace this!
+            var matches =  new Rectangle[] { };  // replace this!
+
+            _matchesCount += matches.Length;
+
+            _synchronizationContext.Send(d =>
+            {
+                _currentFrameMatchesTextBox.Text = matches.Length.ToString();
+                _totalFrameMatchesTextBox.Text = _matchesCount.ToString();
+            }, null);
+
+            return matches;
         }
     }
 }
