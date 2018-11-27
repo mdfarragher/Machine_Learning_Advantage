@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using Accord.Imaging.Filters;
-using Accord.Imaging;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ml_csharp_lesson1
 {
@@ -40,8 +36,7 @@ namespace ml_csharp_lesson1
         /// <param name="e"></param>
         private void MainForm_Load(object sender, EventArgs e)
         {
-            SetVideo(@"D:\MachineLearningCourseMark\Machine_Learning_Advantage-master\Machine_Learning_Advantage\module_5\starter\input.mp4");
-           // SetVideo("./input.mp4");
+            SetVideo("./input.mp4");
             videoPlayer.Start();
         }
 
@@ -109,7 +104,7 @@ namespace ml_csharp_lesson1
             // ADD YOUR CODE HERE
             // ******************
 
-            var matches =  new Rectangle[] { };  // replace this!
+            var matches = new Rectangle[] { };  // replace this!
 
             _matchesCount += matches.Length;
 
