@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Bootcamp.CompVis.Pose
+namespace ml_csharp_lesson3
 {
     /// <summary>
     /// Utility class with helper methods. 

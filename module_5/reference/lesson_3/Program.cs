@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Bootcamp.CompVis.Pose
+namespace ml_csharp_lesson3
 {
     static class Program
     {

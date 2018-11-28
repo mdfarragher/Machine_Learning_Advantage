@@ -8,7 +8,7 @@ using DlibDotNet.Extensions;
 using OpenCvSharp;
 using System.Drawing;
 
-namespace Bootcamp.CompVis.Pose
+namespace ml_csharp_lesson3
 {
     public partial class MainForm : Form
     {

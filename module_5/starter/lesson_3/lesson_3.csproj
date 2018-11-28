@@ -7,8 +7,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FA53672E-FD22-4FB3-A3BD-22DC1FD14080}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Bootcamp.CompVis.Pose</RootNamespace>
-    <AssemblyName>pose</AssemblyName>
+    <RootNamespace>ml_csharp_lesson3</RootNamespace>
+    <AssemblyName>ml_csharp_lesson3</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

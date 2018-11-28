@@ -1,4 +1,4 @@
-﻿namespace Bootcamp.CompVis.Pose
+﻿namespace ml_csharp_lesson3
 {
     partial class MainForm
     {
