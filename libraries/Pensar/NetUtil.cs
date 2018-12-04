@@ -45,9 +45,15 @@ namespace Pensar
         /// <returns>The created neural network variable.</returns>
         public static CNTK.Variable Var(
             IEnumerable<int> shape,
-            CNTK.DataType dataType)
+            CNTK.DataType dataType,
+            string name = "",
+            List<CNTK.Axis> dynamicAxes = null)
         {
-            return CNTK.Variable.InputVariable(CNTK.NDShape.CreateNDShape(shape), dataType);
+            return CNTK.Variable.InputVariable(
+                CNTK.NDShape.CreateNDShape(shape), 
+                dataType,
+                name: name,
+                dynamicAxes: dynamicAxes);
         }
 
         /// <summary>
@@ -166,6 +172,57 @@ namespace Pensar
             double dropoutRate)
         {
             return CNTK.CNTKLib.Dropout(input, 0.5);
+        }
+
+        /// <summary>
+        /// Add a one-hot encoder to the neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="numberOfClasses">The number of output classes to encode</param>
+        /// <param name="outputSparse">Indicates if the output is a sparse vector</param>
+        /// <returns>The neural network with the dropout layer added</returns>
+        public static CNTK.Variable OneHotOp(
+            this CNTK.Variable input,
+            int numberOfClasses,
+            bool outputSparse
+            )
+        {
+            return CNTK.CNTKLib.OneHotOp(input, (uint)numberOfClasses, outputSparse, new CNTK.Axis(0));
+        }
+
+        /// <summary>
+        /// Add an embedding layer to the neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="embeddingDimensions">The number of embedding dimensions to create</param>
+        /// <returns>The neural network with the dropout layer added</returns>
+        public static CNTK.Variable Embedding(
+            this CNTK.Variable input,
+            int embeddingDimensions)
+        {
+            var weight_shape = new int[] { embeddingDimensions, CNTK.NDShape.InferredDimension };
+            var E = new CNTK.Parameter(
+              weight_shape,
+              CNTK.DataType.Float,
+              CNTK.CNTKLib.GlorotUniformInitializer(),
+              NetUtil.CurrentDevice);
+
+            return CNTK.CNTKLib.Times(E, input);
+        }
+
+        /// <summary>
+        /// Add an LSTM layer to the neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="lstmDimensions">The number of lstm dimensions to user</param>
+        /// <param name="cellDimensions">The number of cell dimensions to use</param>
+        /// <returns>The neural network with the dropout layer added</returns>
+        public static CNTK.Variable LSTM(
+            this CNTK.Variable input,
+            int lstmDimensions,
+            int cellDimensions)
+        {
+            return LSTMSequenceClassifier.LSTM(input, lstmDimensions, cellDimensions, NetUtil.CurrentDevice, "lstm");
         }
 
         /// <summary>

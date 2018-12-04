@@ -223,6 +223,100 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Get a sequence batch from the given variable.
+        /// </summary>
+        /// <param name="variable">The variable to use.</param>
+        /// <param name="sequenceLength">The number of time periods in the data sequence.</param>
+        /// <param name="source">The variable data.</param>
+        /// <param name="begin">The index of the first value to use.</param>
+        /// <param name="end">The index of the last value to use.</param>
+        /// <returns>A batch of values taken from the given variable.</returns>
+        public static CNTK.Value GetSequenceBatch(
+            this CNTK.Variable variable,
+            int sequenceLength,
+            float[][] source,
+            int begin,
+            int end)
+        {
+            System.Diagnostics.Debug.Assert((variable.Shape.Dimensions.Count == 0) || ((variable.Shape.Dimensions.Count == 1) && (variable.Shape.Dimensions[0] == 1)));
+            System.Diagnostics.Debug.Assert(source[0].Length == sequenceLength);
+            var num_indices = end - begin;
+            var cpu_blob = new float[num_indices * sequenceLength];
+            var row_index = 0;
+            for (var index = begin; index != end; index++)
+            {
+                System.Buffer.BlockCopy(source[index], 0, cpu_blob, row_index * sequenceLength * sizeof(float), sequenceLength * sizeof(float));
+                row_index++;
+            }
+            var blob_shape = variable.Shape.AppendShape(new int[] { sequenceLength, end - begin });
+            var ndArrayView = new CNTK.NDArrayView(blob_shape, cpu_blob, NetUtil.CurrentDevice);
+            return new CNTK.Value(ndArrayView);
+        }
+
+        /// <summary>
+        /// Get a sequence batch from the given variable.
+        /// </summary>
+        /// <param name="variable">The variable to use.</param>
+        /// <param name="sequenceLength">The number of time periods in the data sequence.</param>
+        /// <param name="source">The variable data.</param>
+        /// <param name="indices">The array of data indices to use.</param>
+        /// <param name="begin">The first index to use.</param>
+        /// <param name="end">The Last index to use.</param>
+        /// <returns>A batch of values taken from the given variable.</returns>
+        public static CNTK.Value GetSequenceBatch(
+            this CNTK.Variable variable,
+            int sequenceLength,
+            float[][] source,
+            int[] indices,
+            int begin,
+            int end)
+        {
+            System.Diagnostics.Debug.Assert((variable.Shape.Dimensions.Count == 0) || ((variable.Shape.Dimensions.Count == 1) && (variable.Shape.Dimensions[0] == 1)));
+            System.Diagnostics.Debug.Assert(source[0].Length == sequenceLength);
+            var num_indices = end - begin;
+            var cpu_blob = new float[num_indices * sequenceLength];
+            var row_index = 0;
+            for (var index = begin; index != end; index++)
+            {
+                System.Buffer.BlockCopy(source[indices[index]], 0, cpu_blob, row_index * sequenceLength * sizeof(float), sequenceLength * sizeof(float));
+                row_index++;
+            }
+            var blob_shape = variable.Shape.AppendShape(new int[] { sequenceLength, end - begin });
+            var ndArrayView = new CNTK.NDArrayView(blob_shape, cpu_blob, NetUtil.CurrentDevice);
+            return new CNTK.Value(ndArrayView);
+        }
+
+        /// <summary>
+        /// Get a sequence batch from the given variable.
+        /// </summary>
+        /// <param name="variable">The variable to use.</param>
+        /// <param name="sequenceLength">The number of time periods in the data sequence.</param>
+        /// <param name="source">The variable data.</param>
+        /// <param name="begin">The index of the first value to use.</param>
+        /// <param name="end">The index of the last value to use.</param>
+        /// <returns>A batch of values taken from the given variable.</returns>
+        public static CNTK.Value GetSequenceBatch(
+            this CNTK.Variable variable,
+            int sequenceLength,
+            float[] source, 
+            int begin, 
+            int end)
+        {
+            System.Diagnostics.Debug.Assert((variable.Shape.Dimensions.Count == 0) || ((variable.Shape.Dimensions.Count == 1) && (variable.Shape.Dimensions[0] == 1)));
+            var num_indices = end - begin;
+            var cpu_tensors = new float[num_indices][];
+            var row_index = 0;
+            for (var index = begin; index != end; index++)
+            {
+                cpu_tensors[row_index] = new float[sequenceLength];
+                cpu_tensors[row_index][sequenceLength - 1] = source[index];
+                row_index++;
+            }
+            var result = CNTK.Value.CreateBatchOfSequences(variable.Shape, cpu_tensors, NetUtil.CurrentDevice, true);
+            return result;
+        }
+
+        /// <summary>
         /// Get a batch from the given image reader.
         /// </summary>
         /// <param name="reader">The image reader to use.</param>
