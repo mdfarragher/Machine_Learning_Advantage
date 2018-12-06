@@ -17,9 +17,13 @@ namespace ml_csharp_lesson3
     /// </summary>
     public partial class MainWindow : Window
     {
+        // ************************************
+        // PUT YOUR VISION API KEY AND URL HERE
+        // ************************************
+
         // Vision API credentials
-        private const string VISION_KEY = "6e546577124f45e2ab0b926c6559c434";
-        private const string VISION_API = "https://westeurope.api.cognitive.microsoft.com/vision/v1.0";
+        private const string VISION_KEY = "...";
+        private const string VISION_API = "...";
 
         /// <summary>
         /// The celebrity image to analyze. 
