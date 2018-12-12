@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using Accord.Imaging.Filters;
 using Accord.Imaging;
+using Accord;
 
 namespace ml_csharp_lesson1
 {
@@ -99,8 +100,17 @@ namespace ml_csharp_lesson1
         /// <returns>A Rectangle[] array of found traffic signs</returns>
         private Rectangle[] FindTrafficSigns(Bitmap bitmap)
         {
+            // set up a color filter for 'traffic sign yellow'
+            var yellowFilter = new ColorFiltering(
+                new IntRange(127, 255),
+                new IntRange(127, 255),
+                new IntRange(0, 127));
+
+            // filter the frame so only yellow remains
+            var yellowFrame = yellowFilter.Apply(bitmap);
+
             // convert the image to grayscale
-            var grayFrame = Grayscale.CommonAlgorithms.BT709.Apply(bitmap);
+            var grayFrame = Grayscale.CommonAlgorithms.BT709.Apply(yellowFrame);
 
             // use a sobel edge detector to find color edges
             var edgeDetector = new SobelEdgeDetector();
