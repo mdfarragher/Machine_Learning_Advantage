@@ -110,6 +110,40 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Add a 1D convolution layer to a neural network.
+        /// </summary>
+        /// <param name="input">The neural network to expand.</param>
+        /// <param name="outputChannels">The number of output channels</param>
+        /// <param name="filterShape">The shape of the filter</param>
+        /// <param name="padding">Use padding or not?</param>
+        /// <param name="bias">Use bias or not?</param>
+        /// <param name="strides">The stride lengths</param>
+        /// <param name="activation">The activation function to use</param>
+        /// <param name="outputName">The name of the layer.</param>
+        /// <returns>The neural network with the convolution layer added.</returns>
+        public static CNTK.Variable Convolution1D(
+            this CNTK.Variable input,
+            int outputChannels,
+            int filterShape,
+            bool padding = false,
+            bool bias = true,
+            int[] strides = null,
+            Func<CNTK.Variable, string, CNTK.Function> activation = null,
+            string outputName = "")
+        {
+            var convolution_map_size = new int[] {
+                filterShape,
+                CNTK.NDShape.InferredDimension,
+                outputChannels
+            };
+            if (strides == null)
+            {
+                strides = new int[] { 1 };
+            }
+            return Convolution(convolution_map_size, input, padding, bias, strides, activation, outputName);
+        }
+
+        /// <summary>
         /// Add a 2D convolution layer to a neural network.
         /// </summary>
         /// <param name="input">The neural network to expand.</param>
@@ -145,6 +179,21 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Transpose two axes in the neural network.
+        /// </summary>
+        /// <param name="input">The neural network to transpose.</param>
+        /// <param name="axis1">The first axis to transpose.</param>
+        /// <param name="axis2">The second axis to transpose.</param>
+        /// <returns>The neural network with the axes transposed.</returns>
+        public static CNTK.Variable TransposeAxes(
+            this CNTK.Variable input,
+            CNTK.Axis axis1,
+            CNTK.Axis axis2)
+        {
+            return CNTK.CNTKLib.TransposeAxes(input, axis1, axis2);
+        }
+
+        /// <summary>
         /// Add a pooling layer to a neural network. 
         /// </summary>
         /// <param name="input">The neural network to expand</param>
@@ -156,6 +205,23 @@ namespace Pensar
             this CNTK.Variable input,
             CNTK.PoolingType poolingType,
             int[] windowShape,
+            int[] strides)
+        {
+            return CNTK.CNTKLib.Pooling(input, poolingType, windowShape, strides);
+        }
+
+        /// <summary>
+        /// Add a pooling layer to a neural network. 
+        /// </summary>
+        /// <param name="input">The neural network to expand</param>
+        /// <param name="poolingType">The type of pooling to perform</param>
+        /// <param name="windowShape">The shape of the pooling window</param>
+        /// <param name="strides">The stride lengths</param>
+        /// <returns>The neural network with the pooling layer added.</returns>
+        public static CNTK.Variable Pooling(
+            this CNTK.Variable input,
+            CNTK.PoolingType poolingType,
+            CNTK.NDShape windowShape,
             int[] strides)
         {
             return CNTK.CNTKLib.Pooling(input, poolingType, windowShape, strides);
@@ -251,6 +317,19 @@ namespace Pensar
             bool allowBlock5Finetuning)
         {
             return DataUtil.VGG16.GetModel(input, allowBlock5Finetuning);
+        }
+
+        /// <summary>
+        /// Add the VGG19 convolutional base to the network.
+        /// </summary>
+        /// <param name="input">The neural network</param>
+        /// <param name="freeze">Set to true to freeze all weights in the network.</param>
+        /// <returns>The neural network with the VGG16 convolutional base added</returns>
+        public static CNTK.Variable VGG19(
+            this CNTK.Variable input,
+            bool freeze)
+        {
+            return DataUtil.VGG19.GetModel(input, freeze);
         }
 
         /// <summary>
@@ -386,6 +465,28 @@ namespace Pensar
                 parameterVector,
                 new CNTK.TrainingParameterScheduleDouble(learningRateSchedule.Item1, learningRateSchedule.Item2),
                 new CNTK.TrainingParameterScheduleDouble(momentumSchedule.Item1, momentumSchedule.Item2),
+                unitGain);
+        }
+
+        /// <summary>
+        /// Get an Adam learner to train the network.
+        /// </summary>
+        /// <param name="input">The network to train.</param>
+        /// <param name="learningRateSchedule">The learning rate schedule.</param>
+        /// <param name="momentumSchedule">The moment schedule.</param>
+        /// <param name="unitGain">The unit gain.</param>
+        /// <returns>An Adamlearner to train the network.</returns>
+        public static CNTK.Learner GetAdamLearner(
+            this CNTK.Function input,
+            double learningRateSchedule,
+            double momentumSchedule,
+            bool unitGain = true)
+        {
+            var parameterVector = new CNTK.ParameterVector((System.Collections.ICollection)input.Parameters());
+            return CNTK.CNTKLib.AdamLearner(
+                parameterVector,
+                new CNTK.TrainingParameterScheduleDouble(learningRateSchedule),
+                new CNTK.TrainingParameterScheduleDouble(momentumSchedule),
                 unitGain);
         }
 

@@ -64,7 +64,7 @@ namespace Pensar
         /// <summary>
         /// The training curve with loss and accuracy values.
         /// </summary>
-        public List<List<double>> TrainingCurve = null;
+        public List<List<double>> TrainingCurves = null;
 
         // protected members
         protected CNTK.Variable features = null;
@@ -82,9 +82,9 @@ namespace Pensar
         /// </summary>
         public TrainingEngine()
         {
-            TrainingCurve = new List<List<double>>();
-            TrainingCurve.Add(new List<double>());
-            TrainingCurve.Add(new List<double>());
+            TrainingCurves = new List<List<double>>();
+            TrainingCurves.Add(new List<double>());
+            TrainingCurves.Add(new List<double>());
         }
 
         /// <summary>
@@ -193,11 +193,12 @@ namespace Pensar
             }
 
             // write the model summary
+            Console.WriteLine("  Model architecture:");
             Console.WriteLine(Model.ToSummary());
 
             // clear the training curves
-            TrainingCurve[0].Clear();
-            TrainingCurve[1].Clear();
+            TrainingCurves[0].Clear();
+            TrainingCurves[1].Clear();
 
             // train for a certain number of epochs
             for (int epoch = 0; epoch < NumberOfEpochs; epoch++)
@@ -209,8 +210,8 @@ namespace Pensar
                 var epoch_validation_accuracy = EvaluateBatches();
 
                 // add to training curve
-                TrainingCurve[0].Add(epoch_training_metric);
-                TrainingCurve[1].Add(epoch_validation_accuracy);
+                TrainingCurves[0].Add(epoch_training_metric);
+                TrainingCurves[1].Add(epoch_validation_accuracy);
 
                 // write current loss and accuracy
                 var elapsedTime = DateTime.Now.Subtract(epoch_start_time);

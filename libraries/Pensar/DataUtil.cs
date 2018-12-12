@@ -109,6 +109,78 @@ namespace Pensar
         }
 
         /// <summary>
+        /// The pretrained VGG19 image classifier.
+        /// </summary>
+        public static class VGG19
+        {
+            // private members
+            private const string Filename = "VGG19_ImageNet_Caffe.model";
+            private const string DownloadUrl = "https://www.cntk.ai/Models/Caffe_Converted/VGG19_ImageNet_Caffe.model";
+
+            /// <summary>
+            /// The full path to the downloaded model.
+            /// </summary>
+            private static string GetFullPath()
+            {
+                return Path.Combine(Directory.GetCurrentDirectory(), Path.Combine("models", Filename));
+            }
+
+            /// <summary>
+            /// Get if the model is already downloaded from the internet.
+            /// </summary>
+            public static bool IsDownloaded
+            {
+                get
+                {
+                    string fullPath = GetFullPath();
+                    return File.Exists(fullPath);
+                }
+            }
+
+            /// <summary>
+            /// Download the model from the internet.
+            /// </summary>
+            public static void Download()
+            {
+                string fullPath = GetFullPath();
+                DataUtil.DownloadModel(fullPath, DownloadUrl);
+            }
+
+            /// <summary>
+            /// Load the model from disk.
+            /// </summary>
+            /// <param name="features">The input features for the model.</param>
+            /// <param name="freeze">Set to true to freeze all weights in the network.</param>
+            /// <returns>The fully trained VGG16 model.</returns>
+            public static CNTK.Function GetModel(CNTK.Variable features, bool freeze = false)
+            {
+                // make sure the model has been downloaded
+                if (!IsDownloaded)
+                    Download();
+
+                // load the model into a new function
+                string fullPath = GetFullPath();
+                var model = CNTK.Function.Load(fullPath, NetUtil.CurrentDevice);
+
+                // return the model up to the 'pool5' layer, without feature replacements
+                var cloningMethod = freeze ? CNTK.ParameterCloningMethod.Freeze : CNTK.ParameterCloningMethod.Clone;
+                var pool5_node = model.FindByName("pool5");
+                CNTK.Function cloned_model = null;
+                if (features == null)
+                {
+                    cloned_model = CNTK.Function.Combine(new CNTK.Variable[] { pool5_node }).Clone(cloningMethod);
+                    return cloned_model;
+                }
+
+                // return the model up to the 'pool5' layer, with feature replacements
+                System.Diagnostics.Debug.Assert(model.Arguments.Count == 1);
+                var replacements = new Dictionary<CNTK.Variable, CNTK.Variable>() { { model.Arguments[0], features } };
+                cloned_model = CNTK.Function.Combine(new CNTK.Variable[] { pool5_node }).Clone(cloningMethod, replacements);
+                return cloned_model;
+            }
+        }
+
+        /// <summary>
         /// Unzip the given archive to the specified destination path.
         /// </summary>
         /// <param name="filepath"></param>
