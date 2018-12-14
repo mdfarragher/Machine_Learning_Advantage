@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lesson_2", "starter\lesson_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lesson_3", "starter\lesson_3\lesson_3.csproj", "{7951E1A3-4B53-4F2F-A9BC-6ED63BE0A6E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lesson_4", "reference\lesson_4\lesson_4.csproj", "{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,13 @@ Global
 		{7951E1A3-4B53-4F2F-A9BC-6ED63BE0A6E6}.Release|Any CPU.ActiveCfg = Release|x64
 		{7951E1A3-4B53-4F2F-A9BC-6ED63BE0A6E6}.Release|x64.ActiveCfg = Release|x64
 		{7951E1A3-4B53-4F2F-A9BC-6ED63BE0A6E6}.Release|x64.Build.0 = Release|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Debug|Any CPU.Build.0 = Debug|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Debug|x64.ActiveCfg = Debug|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Debug|x64.Build.0 = Debug|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Release|Any CPU.ActiveCfg = Release|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Release|x64.ActiveCfg = Release|x64
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +111,7 @@ Global
 		{B5A45F24-BEA2-4080-AC18-C85EDDDAB95B} = {8E1792FB-2588-4265-B5A6-6EDD8EFFC701}
 		{748DF4E1-434E-4E03-B504-573C8DC9C861} = {D5D2EE2A-77A7-4B65-B61D-DE225C942940}
 		{7951E1A3-4B53-4F2F-A9BC-6ED63BE0A6E6} = {D5D2EE2A-77A7-4B65-B61D-DE225C942940}
+		{D9D82536-B4C5-42B5-B859-D8A0A250EB3C} = {8E1792FB-2588-4265-B5A6-6EDD8EFFC701}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C17B23C5-612B-4409-B5C6-1F6C532F74F0}
