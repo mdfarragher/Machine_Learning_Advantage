@@ -128,7 +128,7 @@ namespace Pensar
             bool padding = false,
             bool bias = true,
             int[] strides = null,
-            Func<CNTK.Variable, string, CNTK.Function> activation = null,
+            Func<CNTK.Variable, CNTK.Function> activation = null,
             string outputName = "")
         {
             var convolution_map_size = new int[] {
@@ -162,7 +162,7 @@ namespace Pensar
             bool padding = false,
             bool bias = true,
             int[] strides = null,
-            Func<CNTK.Variable, string, CNTK.Function> activation = null,
+            Func<CNTK.Variable, CNTK.Function> activation = null,
             string outputName = "")
         {
             var convolution_map_size = new int[] {
@@ -176,6 +176,84 @@ namespace Pensar
                 strides = new int[] { 1 };
             }
             return Convolution(convolution_map_size, input, padding, bias, strides, activation, outputName);
+        }
+
+        /// <summary>
+        /// Add a convolution transpose layer to the network.
+        /// </summary>
+        /// <param name="input">The neural network to extend</param>
+        /// <param name="filterShape">The shape of the filters to use</param>
+        /// <param name="numberOfFilters">The number of filters to use</param>
+        /// <param name="activation">The activation function to use</param>
+        /// <param name="padding">Set to true to use padding</param>
+        /// <param name="strides">The stride lengths to use</param>
+        /// <param name="bias">Set to true to introduce bias</param>
+        /// <param name="outputShape">The output shape to generate</param>
+        /// <param name="reductionRank"></param>
+        /// <param name="dilation"></param>
+        /// <param name="maxTempMemSizeInSamples"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        static public CNTK.Variable ConvolutionTranspose(
+            this CNTK.Variable input,
+            int[] filterShape,
+            int numberOfFilters,
+            Func<CNTK.Variable, CNTK.Function> activation = null,
+            bool padding = true,
+            int[] strides = null,
+            bool bias = true,
+            int[] outputShape = null,
+            uint reductionRank = 1,
+            int[] dilation = null,
+            uint maxTempMemSizeInSamples = 0,
+            string name = "")
+        {
+            if (strides == null)
+            {
+                strides = new int[] { 1 };
+            }
+            var sharing = PadToShape(filterShape, true);
+            var thePadding = PadToShape(filterShape, padding);
+            if (reductionRank != 1)
+            {
+                throw new NotSupportedException("reduction_rank should be 1");
+            }
+            thePadding = ConcatenateArrays(thePadding, new bool[] { false });
+            if (dilation == null)
+            {
+                dilation = PadToShape(filterShape, 1);
+            }
+            var output_channels_shape = new int[] { numberOfFilters };
+            var kernel_shape = ConcatenateArrays(filterShape, output_channels_shape, new int[] { CNTK.NDShape.InferredDimension });
+            var output_full_shape = outputShape;
+            if (output_full_shape != null)
+            {
+                output_full_shape = ConcatenateArrays(outputShape, output_channels_shape);
+            }
+            var filter_rank = filterShape.Length;
+            var init = CNTK.CNTKLib.GlorotUniformInitializer(CNTK.CNTKLib.DefaultParamInitScale, CNTK.CNTKLib.SentinelValueForInferParamInitRank, CNTK.CNTKLib.SentinelValueForInferParamInitRank, 1);
+            var W = new CNTK.Parameter(kernel_shape, CNTK.DataType.Float, init, NetUtil.CurrentDevice, name = "W");
+            var r = CNTK.CNTKLib.ConvolutionTranspose(
+              convolutionMap: W,
+              operand: input,
+              strides: strides,
+              sharing: new CNTK.BoolVector(sharing),
+              autoPadding: new CNTK.BoolVector(thePadding),
+              outputShape: output_full_shape,
+              dilation: dilation,
+              reductionRank: reductionRank,
+              maxTempMemSizeInSamples: maxTempMemSizeInSamples);
+            if (bias)
+            {
+                var b_shape = ConcatenateArrays(MakeOnesArray(filterShape.Length), output_channels_shape);
+                var b = new CNTK.Parameter(b_shape, 0.0f, NetUtil.CurrentDevice, "B");
+                r = CNTK.CNTKLib.Plus(r, b);
+            }
+            if (activation != null)
+            {
+                r = activation(r);
+            }
+            return r;
         }
 
         /// <summary>
@@ -304,6 +382,19 @@ namespace Pensar
         {
             var scalarTensor = CNTK.Constant.Scalar<T>(scalar, NetUtil.CurrentDevice);
             return CNTK.CNTKLib.ElementTimes(scalarTensor, input);
+        }
+
+        /// <summary>
+        /// Reshape the current network tensor to the new shape.
+        /// </summary>
+        /// <param name="input">The neural network</param>
+        /// <param name="newShape">The new shape to reshape the tensor to</param>
+        /// <returns>The neural network with the reshape layer added</returns>
+        public static CNTK.Variable Reshape(
+            this CNTK.Variable input,
+            CNTK.NDShape newShape)
+        {
+            return CNTK.CNTKLib.Reshape(input, newShape);
         }
 
         /// <summary>
@@ -491,6 +582,22 @@ namespace Pensar
         }
 
         /// <summary>
+        /// Get an Ada Delta learner to train the network.
+        /// </summary>
+        /// <param name="input">The network to train.</param>
+        /// <param name="learningRateSchedule">The learning rate schedule.</param>
+        /// <returns>An AdaDeltaLearner to train the network.</returns>
+        public static CNTK.Learner GetAdaDeltaLearner(
+            this CNTK.Function input,
+            double learningRateSchedule
+            )
+        {
+            return CNTK.CNTKLib.AdaDeltaLearner(
+                parameters: new CNTK.ParameterVector((System.Collections.ICollection)input.Parameters()),
+                learningRateSchedule: new CNTK.TrainingParameterScheduleDouble(learningRateSchedule));
+        }
+
+        /// <summary>
         /// Get a trainer to train the network.
         /// </summary>
         /// <param name="input">The network to train.</param>
@@ -631,7 +738,7 @@ namespace Pensar
           bool padding,
           bool bias,
           int[] strides,
-          Func<CNTK.Variable, string, CNTK.Function> activation = null,
+          Func<CNTK.Variable, CNTK.Function> activation = null,
           string outputName = "")
         {
             var W = new CNTK.Parameter(
@@ -660,7 +767,7 @@ namespace Pensar
 
             if (activation != null)
             {
-                result = activation(result, outputName);
+                result = activation(result);
             }
             return result;
         }
@@ -689,8 +796,28 @@ namespace Pensar
         private static int[] MakeOnesArray(int numOnes)
         {
             var ones = new int[numOnes];
-            for (int i = 0; i < numOnes; i++) { ones[i] = 1; }
+            for (int i = 0; i < numOnes; i++)
+            {
+                ones[i] = 1;
+            }
             return ones;
+        }
+
+        /// <summary>
+        /// Create an array with the same size as a given array filled with default values.
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="filter_shape">The array to use</param>
+        /// <param name="value">The default value to use</param>
+        /// <returns>A new array of the same size as filter_shape filled with the default values/returns>
+        static T[] PadToShape<T>(int[] filter_shape, T value) where T : struct
+        {
+            var result = new T[filter_shape.Length];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = value;
+            }
+            return result;
         }
 
 
