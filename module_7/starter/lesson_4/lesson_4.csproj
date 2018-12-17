@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D9D82536-B4C5-42B5-B859-D8A0A250EB3C}</ProjectGuid>
+    <ProjectGuid>{A0574B38-A27C-421C-ABDA-15512E1AEFC9}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>ml_csharp_lesson3</RootNamespace>
     <AssemblyName>ml_csharp_lesson3</AssemblyName>
