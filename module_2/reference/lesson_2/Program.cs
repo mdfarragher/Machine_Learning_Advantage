@@ -131,7 +131,7 @@ namespace ml_csharp_lesson2
 
             // plot a histogram of the nonzero weights
             var histogram = new Histogram();
-            histogram.Compute(regression.Weights, 1); // set to 1.0 when regularization is disabled
+            histogram.Compute(regression.Weights, 1.0); // set to 1.0 when regularization is disabled
 
             // draw the histogram
             Plot(histogram, "Without Regularization", "prediction", "count");
