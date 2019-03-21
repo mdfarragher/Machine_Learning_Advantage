@@ -121,8 +121,8 @@ namespace ml_csharp_lesson2
             }
 
             // get a training and validation image reader
-            Console.WriteLine("Augmentation is: OFF");
-            var trainingReader = DataUtil.GetImageReader("train_map.txt", imageWidth, imageHeight, numChannels, 2, randomizeData: true, augmentData: false);
+            Console.WriteLine("Augmentation is: ON");
+            var trainingReader = DataUtil.GetImageReader("train_map.txt", imageWidth, imageHeight, numChannels, 2, randomizeData: true, augmentData: true);
             var validationReader = DataUtil.GetImageReader("validation_map.txt", imageWidth, imageHeight, numChannels, 2, randomizeData: false, augmentData: false);
 
             // build features and labels
@@ -216,8 +216,8 @@ namespace ml_csharp_lesson2
                     // test the network on the batch
                     result += evaluator.TestBatch(
                         new[] {
-                            (features, featuresBatch),
-                            (labels,  labelsBatch)
+                        (features, featuresBatch),
+                        (labels,  labelsBatch)
                         }
                     );
                     sampleCount += (int)featuresBatch.numberOfSamples;
@@ -230,10 +230,15 @@ namespace ml_csharp_lesson2
                 Console.WriteLine($"validation accuracy: {accuracy}");
             }
 
-            // plot the training and validation curves
+            // save the trained network
+            Console.WriteLine("Saving trained network...");
+            network.Save(@"..\..\..\..\..\models\catdogdetector.model");
+
+            //// plot the training and validation curves
             var wpfApp = new System.Windows.Application();
             wpfApp.Run(new PlotWindow(lines));
 
+            Console.WriteLine("Done!");
             Console.ReadLine();
         }
     }

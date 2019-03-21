@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pensar", "..\libraries\Pensar\Pensar.csproj", "{919C42FF-3FAA-4ED3-95A6-51325B9F454C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lesson_2b", "reference\lesson_2b\lesson_2b.csproj", "{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,14 @@ Global
 		{919C42FF-3FAA-4ED3-95A6-51325B9F454C}.Release|Any CPU.Build.0 = Release|x64
 		{919C42FF-3FAA-4ED3-95A6-51325B9F454C}.Release|x64.ActiveCfg = Release|x64
 		{919C42FF-3FAA-4ED3-95A6-51325B9F454C}.Release|x64.Build.0 = Release|x64
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Debug|x64.ActiveCfg = Debug|x64
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Debug|x64.Build.0 = Debug|x64
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Release|x64.ActiveCfg = Release|x64
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +108,7 @@ Global
 		{3067A7B6-DDC4-4147-98AA-572F4F3355BE} = {8E1792FB-2588-4265-B5A6-6EDD8EFFC701}
 		{4B7C2D9A-E6BE-4036-965D-95B390E8F67D} = {D5D2EE2A-77A7-4B65-B61D-DE225C942940}
 		{919C42FF-3FAA-4ED3-95A6-51325B9F454C} = {FA02A1B3-EDC2-4303-B840-37F449767250}
+		{3DCD551A-78F0-4F42-887D-7D5ED85FA01C} = {8E1792FB-2588-4265-B5A6-6EDD8EFFC701}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C17B23C5-612B-4409-B5C6-1F6C532F74F0}

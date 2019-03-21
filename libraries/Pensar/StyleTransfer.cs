@@ -21,7 +21,7 @@ namespace Pensar
         /// <param name="mat">The input image as an OpenCv Mat object.</param>
         /// <param name="offsets">Offsets to apply to each color channel.</param>
         /// <returns>An 1-dimensional float array containing the image data.</returns>
-        private static float[] FlattenByChannel(Mat mat, float[] offsets)
+        public static float[] FlattenByChannel(Mat mat, float[] offsets)
         {
             var num_pixels = mat.Size().Height * mat.Size().Width;
             float[] result = new float[num_pixels * 3];
