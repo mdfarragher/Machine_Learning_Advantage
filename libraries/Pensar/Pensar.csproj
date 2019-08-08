@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CNTK.GPU" Version="2.6.0" />
+    <PackageReference Include="CNTK.GPU" Version="2.7.0" />
     <PackageReference Include="OpenCvSharp3-AnyCPU" Version="4.0.0.20181129" />
   </ItemGroup>
 
