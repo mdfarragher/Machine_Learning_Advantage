@@ -134,7 +134,7 @@ namespace ml_csharp_lesson2
             var testPartitionY = DataUtil.LoadBinary<float>("y_test_imdb.bin", 25000);
 
             // reserve the final 20% of training data for validation
-            var pivot = (int)(trainingPartitionX.Length * 0.8);
+            var pivot = (int)(trainingPartitionX.Length * 0.2);
             var trainingFeatures = trainingPartitionX.Skip(pivot).ToArray();
             var trainingLabels = trainingPartitionY.Skip(pivot).ToArray();
             var validationFeatures = trainingPartitionX.Take(pivot).ToArray();
